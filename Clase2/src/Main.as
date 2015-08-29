@@ -31,7 +31,7 @@ package
 		
 		private function startGame():void 
 		{
-			trace("YOLO");
+			trace("YOLO XD");
 		}
 	
 	}
