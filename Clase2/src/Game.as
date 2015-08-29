@@ -11,11 +11,15 @@ package
 	import starling.events.Touch;
 	import starling.events.TouchEvent;
 	import starling.events.TouchPhase;
+	import time.DTempo;
 	import Utils.start.DStarling;
+	import Utils.states.DState;
 	
 	public class Game extends Sprite
 	{
 		private var timer:Timer = new Timer(1000);
+		private var monsters:Number;
+		private var elapsed:Number;
 		
 		public function Game()
 		{
@@ -29,9 +33,11 @@ package
 		
 		public function start():void
 		{
-			trace("start");
+			/*trace("start");
 			timer.addEventListener(TimerEvent.TIMER, onTimer);
-			timer.start();
+			timer.start();*/
+			
+			stage.addEventListener(Event.ENTER_FRAME, loop);
 			
 			var bg:Image = new Image(DStarling.assetsManager.getTexture("scene1"));
 			addChild(bg);
@@ -39,27 +45,40 @@ package
 			bg.width = stage.width;
 			bg.height = stage.height;
 			
-			stage.addEventListener(TouchEvent.TOUCH,onTouch);
+			stage.addEventListener(TouchEvent.TOUCH, onTouch);
+			monsters = 0;
+			elapsed = 0;
+			DTempo.init();
 		}
 		
-		private function onTimer(e:TimerEvent):void
+		private function loop(e:Event):void 
 		{
-			if (timer.currentCount % 4 == 0)
+			DTempo.update();
+			//trace("delta " + DTempo.dt);
+			
+			elapsed += DTempo.dt;
+			
+			if (elapsed >= 1) 
 			{
-				var mx:Image = new Image(DStarling.assetsManager.getTexture("coin"));
-				addChild(mx);
-				mx.x = Math.random() * stage.stageWidth;
-				mx.y = Math.random() * stage.stageHeight;
-				mx.name = 'coin';
-			}
-			else
-			{
-				var mc:MovieClip = new MovieClip(DStarling.assetsManager.getTextures("walk00"));
-				addChild(mc);
-				mc.x = Math.random() * stage.stageWidth;
-				mc.y = Math.random() * stage.stageHeight;
-				Starling.juggler.add(mc);
-				mc.name = 'green';
+				//trace(elapsed);
+				elapsed = 0;
+				if (monsters > 1 && monsters % 4 == 0) 
+				{
+					var mx:Image = new Image(DStarling.assetsManager.getTexture("coin"));
+					addChild(mx);
+					mx.x = Math.random() * stage.stageWidth;
+					mx.y = Math.random() * stage.stageHeight;
+					mx.name = 'coin';
+					monsters = 0;
+				} else {
+					var mc:MovieClip = new MovieClip(DStarling.assetsManager.getTextures("walk00"));
+					addChild(mc);
+					mc.x = Math.random() * stage.stageWidth;
+					mc.y = Math.random() * stage.stageHeight;
+					Starling.juggler.add(mc);
+					mc.name = 'green';
+					monsters++;
+				}
 			}
 		}
 		
@@ -71,7 +90,8 @@ package
 				if (touch.phase == TouchPhase.BEGAN)
 				{
 					var content:DisplayObject = e.target as DisplayObject;
-					if (content.name == 'coin' || content.name = 'green') 
+					content.name;
+					if (content.name == 'coin' || content.name == 'green') 
 					{
 						removeChild(content);
 					}
